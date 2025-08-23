@@ -1,6 +1,7 @@
 //NAVHEADER
 import Nav1 from "./Nav1";
 import Nav2 from "./Nav2";
+import Nav3 from "./Nav3";
 //HEADER
 import Header1 from "./Header1";
 import Header2 from "./Header2";
@@ -69,6 +70,7 @@ export {
   Chat4,
   Nav1,
   Nav2,
+  Nav3,
   Header1,
   Header2,
   Header3,

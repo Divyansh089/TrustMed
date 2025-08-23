@@ -1,14 +1,15 @@
 import React from "react";
 
 //INTERNAL IMPORT ICON
-import { Nav1, Nav2 } from "../../SVG/index";
+import { Nav1, Nav2  ,Nav3} from "../../SVG/index";
 
 const NavHeader = () => {
   return (
     <div className="nav-header">
       <a href="/" className="brand-logo">
         <Nav1 />
-        <Nav2 />
+        {/* <Nav2 /> */}
+        <Nav3 />
       </a>
       <div className="nav-control">
         <div className="hamburger">
