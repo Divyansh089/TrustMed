@@ -10,16 +10,6 @@ In this comprehensive tutorial, we will guide you through the process of buildin
 
 Kindly follow the following Instructions to run the project in your system and install the necessary requirements
 
-- [Final Source Code](https://www.theblockchaincoders.com/sourceCode/build-and-deploy-blockchain-web3-tools:-next.js-solana-binance-solidity-and-ico-marketplace)
-
-#### Setup Video
-
-- [Final Code Setup video](https://youtu.be/0TwuL8V9zUE?si=UFuWkzh-DofBndjp)
-
-```
-  WATCH: Setup & Demo Of Project
-```
-
 #### Install Vs Code Editor
 
 ```https://code.visualstudio.com/download
@@ -40,37 +30,13 @@ Kindly follow the following Instructions to run the project in your system and i
  GET PINATA SECRET KEY
 ```
 
-#### Clone Starter File
-
-```https://github.com/daulathussain/Airdrop-Crypto-Starter-File
-  GET: Project Starter File Download
-```
-
 All you need to follow the complete project and follow the instructions which are explained in the tutorial by Daulat
 
 ## Final Code Instruction
 
 If you download the final source code then you can follow the following instructions to run the Dapp successfully
 
-#### Setup Video
 
-```
-  WATCH: Setup & Demo Of Project
-```
-
-#### Final Source Code
-
-```
-  Download the Final Source Code
-  URL: https://www.theblockchaincoders.com/SourceCode
-```
-
-#### Install Vs Code Editor
-
-```
-  GET: VsCode Editor
-  URL: https://code.visualstudio.com/download
-```
 
 #### NodeJs & NPM Version
 
@@ -79,17 +45,6 @@ If you download the final source code then you can follow the following instruct
   VIDEO: https://youtu.be/PIR0oBVowXU?si=_jVYKmd94tPjmuQR
   NPM: 8.19.2
   URL: https://nodejs.org/en/download
-```
-
-#### Test Faucets
-
-Alchemy will provide you with some free test faucets which you can transfer to your wallet address for deploying the contract
-
-```
-
-Get: Free Test Faucets
-URL: https://www.theblockchaincoders.com/resource
-
 ```
 
 #### RemixID
@@ -124,14 +79,6 @@ We are using RemixID for deploying the contract and generation of the ABI in the
   NEXT_PUBLIC_PINATA_SECRECT_KEY = YOUR_PINATA_SECRECT_KEY
 ```
 
-## Important Links
-
-- [Get Pro Blockchain Developer Course](https://www.theblockchaincoders.com/pro-nft-marketplace)
-- [Support Creator](https://bit.ly/Support-Creator)
-- [All Projects Source Code](https://www.theblockchaincoders.com/SourceCode)
-
 ## Authors
 
-- [@theblockchaincoders.com](https://www.theblockchaincoders.com/)
-- [@consultancy](https://www.theblockchaincoders.com/consultancy)
-- [@youtube](https://www.youtube.com/@daulathussain)
+- [Divyansh089](https://github.com/Divyansh089)
