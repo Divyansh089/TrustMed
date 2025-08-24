@@ -6,7 +6,10 @@ import { StateContextProvider } from "../Context/index";
 
 export default function App({ Component, pageProps }) {
   return (
-    <>
+    <><Head>
+        <link rel="icon" href="/favicon.ico" />
+        <title>TrustMed</title>
+      </Head>
       <StateContextProvider>
         <Component {...pageProps} />
         <Toaster />
