@@ -1,12 +1,30 @@
-# Medical Health Management Blockchain Dapp
+TrustMed – Decentralized Healthcare Management System 🌐💊
 
-Build & Deploy a Medical Health Management Blockchain Dapp | Solidity, Hardhat, Next.js, Context AP and web3 providers
+TrustMed is a next-gen Web3 healthcare DApp that brings secure, transparent, and patient-friendly healthcare to the blockchain. Built on Ethereum and IPFS, it integrates doctors, patients, medicines, and AI assistance into a single decentralized platform.
 
-In this comprehensive tutorial, we will guide you through the process of building and deploying a Medical Health Management Dapp on the blockchain. This step-by-step video covers everything from setting up the development environment to deploying the smart contracts and building a user-friendly frontend. Here's what we'll cover:
+🔹 Key Features
+
+* **Admin Dashboard** – Mentor the system, verify doctors, manage medicines & appointments.
+* **Doctor Dashboard** – Track performance, manage consultations, prescribe digitally.
+* **Doctor Profiles** – Explore specialties, work history, and patient ratings.
+* **Secure Chat** – Real-time, blockchain-backed messaging between patients & doctors.
+* **AI Health Assistant** – Quick guidance for minor health issues, escalates complex cases.
+* **Decentralized Medicine Marketplace** – Buy authentic medicines securely with crypto payments.
+* **Patient-Friendly Functionalities** – Update health records, book appointments, receive prescriptions digitally.
+
+🔹 Why TrustMed?
+
+* **Blockchain Security** – Tamper-proof, trustless operations via smart contracts.
+* **IPFS Storage** – Safe, decentralized storage for medical data & profiles.
+* **Seamless Payments** – Use MetaMask for hassle-free crypto transactions.
+* **Mobile-First** – Healthcare at your fingertips, anytime, anywhere.
+
+TrustMed isn’t just a healthcare platform—it’s a Web3 healthcare revolution. 🚀
+
 
 ## Project Overview
 
-![alt text](demo/pic1)
+![alt text](public/images/demo/pic1)
 
 Kindly follow the following Instructions to run the project in your system and install the necessary requirements
 
