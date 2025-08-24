@@ -1,8 +1,8 @@
-##TrustMed – Decentralized Healthcare Management System 🌐💊
+## TrustMed – Decentralized Healthcare Management System 🌐💊
 
 TrustMed is a next-gen Web3 healthcare DApp that brings secure, transparent, and patient-friendly healthcare to the blockchain. Built on Ethereum and IPFS, it integrates doctors, patients, medicines, and AI assistance into a single decentralized platform.
 
-####🔹 Key Features
+#### 🔹 Key Features
 
 * **Admin Dashboard** – Mentor the system, verify doctors, manage medicines & appointments.
 * **Doctor Dashboard** – Track performance, manage consultations, prescribe digitally.
@@ -12,7 +12,7 @@ TrustMed is a next-gen Web3 healthcare DApp that brings secure, transparent, and
 * **Decentralized Medicine Marketplace** – Buy authentic medicines securely with crypto payments.
 * **Patient-Friendly Functionalities** – Update health records, book appointments, receive prescriptions digitally.
 
-####🔹 Why TrustMed?
+#### 🔹 Why TrustMed?
 
 * **Blockchain Security** – Tamper-proof, trustless operations via smart contracts.
 * **IPFS Storage** – Safe, decentralized storage for medical data & profiles.
