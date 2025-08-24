@@ -15,7 +15,7 @@ const AddDoctor = () => {
     firstName: "",
     lastName: "",
     gender: "",
-    degrer: "",
+    degree: "",
     yourAddress: "",
     designation: "",
     lastWork: "",
@@ -111,10 +111,10 @@ const AddDoctor = () => {
                   }
                 />
                 <Input
-                  name={"Degrer"}
+                  name={"degree"}
                   type={"text"}
                   handleChange={(e) =>
-                    setDoctor({ ...doctor, degrer: e.target.value })
+                    setDoctor({ ...doctor, degree: e.target.value })
                   }
                 />
                 <div className="col-xl-12">

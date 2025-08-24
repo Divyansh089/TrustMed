@@ -31,9 +31,9 @@ const Auth = ({
                 <div className="row no-gutters">
                   <div className="col-xl-12">
                     <div className="auth-form">
-                      <div className="text-center mb-3">
+                      <div className="text-center mb-3 ">
                         <a>
-                          <img src="images/logo-full.png" alt="" />
+                          <img src="images/TrustMed-logo-enlarged.png"   alt="" />
                         </a>
                       </div>
                       <Steps />
@@ -60,7 +60,7 @@ const Auth = ({
                         <p className="mb-0">
                           Welcome to{" "}
                           <a className="text-primary">
-                            ERES: Your Health, Our Priority
+                            TrustMed: Your Health, Our Priority
                           </a>{" "}
                           where compassionate care meets exceptional medical
                           expertise. <FaArrowRightLong />
