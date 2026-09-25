@@ -40,8 +40,10 @@ import AI from "./AI/AI";
 import AddDoctor from "./Auth/AddDoctor";
 import AddPatient from "./Auth/AddPatient";
 import Auth from "./Auth/Auth";
+import LandingPage from "./Landing/LandingPage";
 
 export {
+  LandingPage,
   AddDoctor,
   UpdateAdmin,
   DoctorAppointment,
