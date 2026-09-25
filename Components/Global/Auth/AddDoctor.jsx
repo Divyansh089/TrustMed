@@ -7,11 +7,11 @@ import Input from "./../Regular/Input";
 import { useStateContext } from "../../../Context/index";
 
 const AddDoctor = ({ setAddDocotr }) => {
-  const { ADD_DOCTOR, setLoader, notifySuccess, notifyError } =
+  const { ADD_DOCTOR, setLoader, notifySuccess, notifyError, address } =
     useStateContext();
 
   const [doctor, setDoctor] = useState({
-    title: "",
+    title: "Dr.",
     firstName: "",
     lastName: "",
     gender: "",
@@ -28,10 +28,16 @@ const AddDoctor = ({ setAddDocotr }) => {
     specialization: "",
     registrationID: "",
     collageAddress: "",
-    walletAddress: "",
+    walletAddress: address || "",
     image: "",
     biography: "",
   });
+
+  useEffect(() => {
+    if (address && !doctor.walletAddress) {
+      setDoctor((prev) => ({ ...prev, walletAddress: address }));
+    }
+  }, [address]);
 
   const handleImageChange = async (event) => {
     try {
@@ -52,12 +58,25 @@ const AddDoctor = ({ setAddDocotr }) => {
 
   return (
     <div
-      className="modal "
+      className="modal fade show"
       style={{
         display: "block",
+        backgroundColor: "rgba(0, 0, 0, 0.65)",
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: 10000,
+        overflowY: "auto",
+        backdropFilter: "blur(5px)",
       }}
     >
-      <div className="modal-dialog modal-lg" role="document">
+      <div
+        className="modal-dialog modal-lg modal-dialog-centered"
+        role="document"
+        style={{ margin: "2.5rem auto" }}
+      >
         <div className="modal-content">
           <div className="modal-header">
             <h5 className="modal-title">Add Doctor</h5>

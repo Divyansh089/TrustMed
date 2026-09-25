@@ -7,12 +7,12 @@ import Input from "./../Regular/Input";
 
 import { useStateContext } from "../../../Context/index";
 const AddPatient = ({ registerDoctors, setAddPatient }) => {
-  const { ADD_PATIENTS, setLoader, notifySuccess, notifyError } =
+  const { ADD_PATIENTS, setLoader, notifySuccess, notifyError, address } =
     useStateContext();
   const [doctor, setDoctor] = useState();
 
   const [patient, setPatient] = useState({
-    title: "",
+    title: "Miss",
     firstName: "",
     lastName: "",
     gender: "",
@@ -21,11 +21,17 @@ const AddPatient = ({ registerDoctors, setAddPatient }) => {
     mobile: "",
     emailID: "",
     birth: "",
-    walletAddress: "",
+    walletAddress: address || "",
     image: "",
     message: "",
     city: "",
   });
+
+  useEffect(() => {
+    if (address && !patient.walletAddress) {
+      setPatient((prev) => ({ ...prev, walletAddress: address }));
+    }
+  }, [address]);
 
   const handleImageChange = async (event) => {
     try {
@@ -46,18 +52,31 @@ const AddPatient = ({ registerDoctors, setAddPatient }) => {
 
   const handleChange = (e) => {
     const selectedID = parseInt(e.target.value);
-    const doctor = registerDoctors.find((doc) => doc.doctorID === selectedID);
+    const doctor = registerDoctors?.find((doc) => doc.doctorID === selectedID);
     setDoctor(doctor);
   };
 
   return (
     <div
-      className="modal "
+      className="modal fade show"
       style={{
         display: "block",
+        backgroundColor: "rgba(0, 0, 0, 0.65)",
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: 10000,
+        overflowY: "auto",
+        backdropFilter: "blur(5px)",
       }}
     >
-      <div className="modal-dialog modal-lg" role="document">
+      <div
+        className="modal-dialog modal-lg modal-dialog-centered"
+        role="document"
+        style={{ margin: "2.5rem auto" }}
+      >
         <div className="modal-content">
           <div className="modal-header">
             <h5 className="modal-title" id="exampleModalLabel">
