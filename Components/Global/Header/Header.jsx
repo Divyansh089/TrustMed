@@ -22,9 +22,59 @@ const Header = ({
   notifications,
   notificationCount,
   setNotificationCount,
+  openComponent,
 }) => {
   const { CONNECT_WALLET, address } = useStateContext();
   const [isMetaMaskInstalled, setIsMetaMaskInstalled] = useState(false);
+
+  const getPageTitle = (comp) => {
+    switch (comp) {
+      case "Home":
+        return "Dashboard";
+      case "Chat":
+        return "Chat";
+      case "Appointment":
+        return "Appointment";
+      case "All Appoinments":
+        return "All Appointments";
+      case "Ask AI":
+        return "TrustMed AI";
+      case "Shop":
+      case "Medicine":
+        return "Medicine Shop";
+      case "Add Medicine":
+        return "Add Medicine";
+      case "Patient":
+        return "Patients";
+      case "Doctor":
+        return "Doctors";
+      case "DoctorProfile":
+      case "Profile":
+        return "Profile";
+      case "DoctorDetails":
+        return "Doctor Details";
+      case "PatientProfile":
+        return "Patient Profile";
+      case "MedicialHistory":
+        return "Medical History";
+      case "YourAppointments":
+        return "Your Appointments";
+      case "Prescription":
+        return "Prescription";
+      case "Notifications":
+        return "Notifications";
+      case "Order":
+        return "Orders";
+      case "User":
+        return "User Settings";
+      case "UpdateAdmin":
+        return "Admin Settings";
+      case "StaffProfile":
+        return "Staff Profile";
+      default:
+        return comp || "Dashboard";
+    }
+  };
 
   useEffect(() => {
     if (typeof window.ethereum !== "undefined") {
@@ -58,7 +108,7 @@ const Header = ({
         <nav className="navbar navbar-expand">
           <div className="collapse navbar-collapse justify-content-between">
             <div className="header-left">
-              <div className="dashboard_bar">Dashboard</div>
+              <div className="dashboard_bar">{getPageTitle(openComponent)}</div>
             </div>
             <ul className="navbar-nav header-right">
               <li className="nav-item dropdown notification_dropdown">

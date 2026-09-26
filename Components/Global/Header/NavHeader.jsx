@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { FaArrowLeft, FaArrowRight } from "../../ReactICON/index";
 
 const NavHeader = () => {
   const [isClosed, setIsClosed] = useState(false);
@@ -20,15 +21,26 @@ const NavHeader = () => {
     }
   }, []);
 
-  const toggleSidebar = () => {
+  const toggleSidebar = (e) => {
+    if (e && e.stopPropagation) {
+      e.stopPropagation();
+    }
     const wrapper = document.getElementById("main-wrapper");
     if (wrapper) {
       wrapper.classList.toggle("menu-toggle");
-      setIsClosed(wrapper.classList.contains("menu-toggle"));
-    }
-    const hamburger = document.querySelector(".hamburger");
-    if (hamburger) {
-      hamburger.classList.toggle("is-active");
+      const isNowClosed = wrapper.classList.contains("menu-toggle");
+      setIsClosed(isNowClosed);
+
+      const body = document.body;
+      if (
+        body.getAttribute("data-sidebar-style") === "full" &&
+        body.getAttribute("data-layout") === "vertical"
+      ) {
+        body.setAttribute(
+          "data-sidebar-position",
+          isNowClosed ? "static" : "fixed"
+        );
+      }
     }
   };
 
@@ -55,11 +67,22 @@ const NavHeader = () => {
           />
         )}
       </a>
-      <div className="nav-control" onClick={toggleSidebar}>
-        <div className="hamburger">
-          <span className="line" />
-          <span className="line" />
-          <span className="line" />
+      <div
+        className="nav-control"
+        onClick={toggleSidebar}
+        role="button"
+        tabIndex={0}
+        aria-label={isClosed ? "Open Sidebar" : "Close Sidebar"}
+        title={isClosed ? "Open Sidebar" : "Close Sidebar"}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            toggleSidebar(e);
+          }
+        }}
+      >
+        <div className={`sidebar-arrow-btn ${isClosed ? "is-closed" : "is-open"}`}>
+          {isClosed ? <FaArrowRight /> : <FaArrowLeft />}
         </div>
       </div>
     </div>

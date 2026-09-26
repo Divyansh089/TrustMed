@@ -108,29 +108,97 @@ const Chat = ({ SEND_MESSAGE }) => {
               <div className="row">
                 <div className="col-xl-3 col-xxl-4 email-left-body">
                   <div className="mb-3 mt-4 mt-sm-0">
-                    <div className="p-0">
-                      <a
-                        href="email-compose.html"
-                        className="btn btn-primary btn-block"
-                      >
-                        Assign Doctors
-                      </a>
+                    <div className="pb-3 border-bottom mb-3">
+                      <h3 className="fs-20 mb-0 text-black font-w600 d-flex align-items-center justify-content-between">
+                        <span>Chat History</span>
+                        <span
+                          className="badge"
+                          style={{
+                            backgroundColor: "rgba(32, 201, 151, 0.12)",
+                            color: "var(--primary)",
+                            fontSize: "11px",
+                            fontWeight: "600",
+                            padding: "4px 8px",
+                            borderRadius: "6px",
+                          }}
+                        >
+                          {friendList?.length || 0} Contacts
+                        </span>
+                      </h3>
                     </div>
-                    <div className=" mt-4" />
-                    {friendList?.map((friend, index) => (
-                      <div
-                        onClick={() => setActiveChat(friend)}
-                        key={index}
-                        className="mail-list rounded mt-2"
-                      >
-                        <a className="list-group-item active">
-                          <i className="fa  font-18 align-middle me-2">
-                            <FaUserDoctor />
-                          </i>
-                          {friend?.name}
-                        </a>
-                      </div>
-                    ))}
+                    {friendList?.map((friend, index) => {
+                      const isSelected =
+                        (activeChat?.userAddress &&
+                          friend?.userAddress &&
+                          activeChat.userAddress.toLowerCase() ===
+                            friend.userAddress.toLowerCase()) ||
+                        activeChat?.name === friend?.name;
+
+                      return (
+                        <div
+                          onClick={() => setActiveChat(friend)}
+                          key={index}
+                          className="mail-list rounded mt-2"
+                          style={{ cursor: "pointer" }}
+                        >
+                          <a
+                            className={`list-group-item ${
+                              isSelected ? "active" : ""
+                            }`}
+                            style={
+                              isSelected
+                                ? {
+                                    backgroundColor: "var(--primary)",
+                                    borderColor: "var(--primary)",
+                                    color: "#ffffff",
+                                    borderRadius: "8px",
+                                    boxShadow:
+                                      "0 4px 10px rgba(32, 201, 151, 0.25)",
+                                    transition: "all 0.2s ease",
+                                  }
+                                : {
+                                    backgroundColor: "#f8fafc",
+                                    borderColor: "#e2e8f0",
+                                    color: "#1e293b",
+                                    borderRadius: "8px",
+                                    transition: "all 0.2s ease",
+                                  }
+                            }
+                            onMouseEnter={(e) => {
+                              if (!isSelected) {
+                                e.currentTarget.style.backgroundColor =
+                                  "rgba(32, 201, 151, 0.1)";
+                                e.currentTarget.style.borderColor =
+                                  "var(--primary)";
+                                e.currentTarget.style.color = "var(--primary)";
+                                e.currentTarget.style.transform =
+                                  "translateX(4px)";
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              if (!isSelected) {
+                                e.currentTarget.style.backgroundColor =
+                                  "#f8fafc";
+                                e.currentTarget.style.borderColor = "#e2e8f0";
+                                e.currentTarget.style.color = "#1e293b";
+                                e.currentTarget.style.transform =
+                                  "translateX(0px)";
+                              }
+                            }}
+                          >
+                            <i
+                              className="fa font-18 align-middle me-2"
+                              style={{
+                                color: isSelected ? "#ffffff" : "var(--primary)",
+                              }}
+                            >
+                              <FaUserDoctor />
+                            </i>
+                            <span className="font-w500">{friend?.name}</span>
+                          </a>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
                 <div className="col-xl-9 col-xxl-8">
