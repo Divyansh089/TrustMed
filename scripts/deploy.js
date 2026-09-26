@@ -1,6 +1,6 @@
 
 //npx hardhat run scripts/deploy.js --network localhost
-//npx hardhat run scripts/deploy.js --network holesky
+//npx hardhat run scripts/deploy.js --network sepolia
 const hre = require("hardhat");
 
 async function main() {

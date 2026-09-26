@@ -1,4 +1,6 @@
 @import url("../public/css/style.css");
+@import url("./tm-landing.css");
+
 
 /* //HOME DOCTORS */
 
@@ -276,3 +278,207 @@
     transform: scale(1) rotate(360deg);
   }
 }
+
+/* DASHBOARD NAV HEADER LOGO */
+.nav-header .brand-logo {
+  display: flex !important;
+  align-items: center !important;
+  transition: all 0.25s ease !important;
+}
+
+.nav-header .logo-abbr {
+  height: 38px !important;
+  max-width: 42px !important;
+  object-fit: contain !important;
+  transition: all 0.25s ease !important;
+}
+
+.nav-header .brand-title {
+  height: 26px !important;
+  max-width: 130px !important;
+  object-fit: contain !important;
+  margin-left: 8px !important;
+  transition: opacity 0.2s ease !important;
+}
+
+[data-theme-version="dark"] .nav-header .brand-title {
+  content: url("/svg/trustmed-text-white.svg") !important;
+}
+
+/* When sidebar is closed (menu-toggle class on #main-wrapper or mini style) */
+#main-wrapper.menu-toggle .nav-header .brand-title,
+[data-sidebar-style="mini"] .nav-header .brand-title,
+[data-sidebar-style="compact"] .nav-header .brand-title {
+  display: none !important;
+}
+
+#main-wrapper.menu-toggle .nav-header .brand-logo,
+[data-sidebar-style="mini"] .nav-header .brand-logo,
+[data-sidebar-style="compact"] .nav-header .brand-logo {
+  justify-content: center !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  margin: 0 auto !important;
+}
+
+#main-wrapper.menu-toggle .nav-header .logo-abbr,
+[data-sidebar-style="mini"] .nav-header .logo-abbr,
+[data-sidebar-style="compact"] .nav-header .logo-abbr {
+  display: block !important;
+  margin: 0 auto !important;
+}
+
+/* CHAT MESSAGE BUBBLES - SENT (RIGHT) & RECEIVED (LEFT) */
+.chat-msg-sent {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  margin-bottom: 1rem;
+  width: 100%;
+}
+
+.chat-bubble-sent {
+  background: linear-gradient(135deg, #04a547 0%, #028738 100%);
+  color: #ffffff !important;
+  border-radius: 18px 18px 4px 18px;
+  padding: 10px 16px;
+  max-width: 75%;
+  box-shadow: 0 2px 8px rgba(4, 165, 71, 0.22);
+  word-break: break-word;
+  text-align: left;
+}
+
+.chat-bubble-sent .chat-msg-meta {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.85);
+  margin-bottom: 4px;
+  text-align: right;
+  font-weight: 500;
+}
+
+.chat-bubble-sent .chat-msg-text {
+  font-size: 14px;
+  line-height: 1.45;
+  color: #ffffff;
+  margin: 0;
+}
+
+.chat-msg-received {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-end;
+  margin-bottom: 1rem;
+  width: 100%;
+}
+
+.chat-bubble-received {
+  background: #f1f5f9;
+  color: #1e293b !important;
+  border-radius: 18px 18px 18px 4px;
+  padding: 10px 16px;
+  max-width: 75%;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  word-break: break-word;
+  text-align: left;
+  border: 1px solid #e2e8f0;
+}
+
+.chat-bubble-received .chat-msg-meta {
+  font-size: 11px;
+  color: #64748b;
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+.chat-bubble-received .chat-msg-text {
+  font-size: 14px;
+  line-height: 1.45;
+  color: #1e293b;
+  margin: 0;
+}
+
+[data-theme-version="dark"] .chat-bubble-received {
+  background: #1e2333;
+  color: #e2e8f0 !important;
+  border-color: #2e354b;
+}
+
+[data-theme-version="dark"] .chat-bubble-received .chat-msg-meta {
+  color: #94a3b8;
+}
+
+[data-theme-version="dark"] .chat-bubble-received .chat-msg-text {
+  color: #e2e8f0;
+}
+
+/* SIDEBAR ACTIVE ICON VISIBILITY FIX */
+.deznav .metismenu > li.mm-active > a,
+.deznav .metismenu > li.active > a,
+.deznav .metismenu > li > a.mm-active,
+.deznav .metismenu > li > a.active {
+  background: var(--primary) !important;
+  color: #ffffff !important;
+}
+
+.deznav .metismenu > li.mm-active > a i,
+.deznav .metismenu > li.mm-active > a svg,
+.deznav .metismenu > li.mm-active > a i svg,
+.deznav .metismenu > li.active > a i,
+.deznav .metismenu > li.active > a svg,
+.deznav .metismenu > li.active > a i svg,
+.deznav .metismenu > li > a.mm-active i,
+.deznav .metismenu > li > a.mm-active svg,
+.deznav .metismenu > li > a.active i,
+.deznav .metismenu > li > a.active svg,
+.deznav .metismenu > li:hover > a i,
+.deznav .metismenu > li:hover > a svg,
+.deznav .metismenu > li:hover > a i svg {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+}
+
+.deznav .metismenu > li.mm-active > a svg path,
+.deznav .metismenu > li.mm-active > a svg g,
+.deznav .metismenu > li.mm-active > a g [fill],
+.deznav .metismenu > li.active > a svg path,
+.deznav .metismenu > li.active > a svg g,
+.deznav .metismenu > li.active > a g [fill],
+.deznav .metismenu > li > a.mm-active svg path,
+.deznav .metismenu > li > a.mm-active svg g,
+.deznav .metismenu > li > a.mm-active g [fill],
+.deznav .metismenu > li:hover > a svg path,
+.deznav .metismenu > li:hover > a svg g,
+.deznav .metismenu > li:hover > a g [fill] {
+  fill: #ffffff !important;
+}
+
+/* Sidebar mini/collapsed mode icon centering and sizing */
+#main-wrapper.menu-toggle .deznav .metismenu > li > a,
+[data-sidebar-style="mini"] .deznav .metismenu > li > a {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 14px 0 !important;
+  width: 100% !important;
+}
+
+#main-wrapper.menu-toggle .deznav .metismenu > li > a i,
+[data-sidebar-style="mini"] .deznav .metismenu > li > a i {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 auto !important;
+  font-size: 22px !important;
+  line-height: 1 !important;
+}
+
+#main-wrapper.menu-toggle .deznav .metismenu > li > a svg,
+[data-sidebar-style="mini"] .deznav .metismenu > li > a svg {
+  width: 22px !important;
+  height: 22px !important;
+  margin: 0 auto !important;
+  display: block !important;
+}
+
+
+
