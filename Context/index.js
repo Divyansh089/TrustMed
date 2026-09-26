@@ -39,47 +39,78 @@ export const StateContextProvider = ({ children }) => {
   //CHECK WALLET CONNECT
   const CHECKI_IF_CONNECTED_LOAD = async () => {
     try {
-      if (!window.ethereum) return console.log("Install MetaMask");
-      HANDLE_NETWORK_SWITCH();
+      if (!window.ethereum) return null;
       const accounts = await window.ethereum.request({
         method: "eth_accounts",
       });
 
-      if (accounts.length) {
+      if (accounts && accounts.length) {
         setAddress(accounts[0]);
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const getBalance = await provider.getBalance(accounts[0]);
-        const bal = ethers.utils.formatEther(getBalance);
-
-        setAccountBalance(bal);
+        try {
+          const provider = new ethers.providers.Web3Provider(window.ethereum);
+          const getBalance = await provider.getBalance(accounts[0]);
+          const bal = ethers.utils.formatEther(getBalance);
+          setAccountBalance(bal);
+        } catch (balErr) {
+          console.log("Balance fetch err:", balErr);
+        }
         return accounts[0];
       } else {
-        return "No account";
+        return null;
       }
     } catch (error) {
-      return "not connected";
+      return null;
     }
   };
 
   //CONNECT WALLET
   const CONNECT_WALLET = async () => {
     try {
-      if (!window.ethereum) return console.log("Install MateMask");
+      if (!window.ethereum) {
+        notifyError("MetaMask is not installed.");
+        return null;
+      }
       await HANDLE_NETWORK_SWITCH();
       const accounts = await window.ethereum.request({
         method: "eth_requestAccounts",
       });
-      const firstAccount = accounts[0];
-
-      setAddress(firstAccount);
-      return firstAccount;
+      if (accounts && accounts.length > 0) {
+        const firstAccount = accounts[0];
+        setAddress(firstAccount);
+        return firstAccount;
+      }
+      return null;
     } catch (error) {
-      console.log(error);
+      console.log("Connect wallet error:", error);
+      return null;
     }
   };
 
   useEffect(() => {
     CHECKI_IF_CONNECTED_LOAD();
+
+    if (typeof window !== "undefined" && window.ethereum) {
+      const handleAccounts = (accounts) => {
+        if (accounts && accounts.length > 0) {
+          setAddress(accounts[0]);
+        } else {
+          setAddress("");
+          setAccountBalance(null);
+        }
+      };
+
+      const handleChain = () => {
+        setReCall((prev) => prev + 1);
+      };
+
+      window.ethereum.on("accountsChanged", handleAccounts);
+      window.ethereum.on("chainChanged", handleChain);
+
+      return () => {
+        window.ethereum.removeListener("accountsChanged", handleAccounts);
+        window.ethereum.removeListener("chainChanged", handleChain);
+      };
+    }
   }, []);
 
   //-------MEDICINE------------
@@ -156,11 +187,24 @@ export const StateContextProvider = ({ children }) => {
 
         const _IPFS_URL = await UPLOAD_METADATA(data);
 
+        // Handle decimal ETH price (e.g. 0.00023 ETH) by converting to Wei (Solidity uint256 integer)
+        const cleanPriceStr = String(price || "0").replace(/[^0-9.]/g, "").trim();
+        let finalPriceInWei;
+        try {
+          finalPriceInWei = ethers.utils.parseUnits(cleanPriceStr || "0", 18);
+        } catch (e) {
+          const rounded = parseFloat(cleanPriceStr || "0").toFixed(18).replace(/\.?0+$/, "");
+          finalPriceInWei = ethers.utils.parseUnits(rounded || "0", 18);
+        }
+
+        const finalQuantity = parseInt(String(quentity).replace(/[^0-9]/g, ""), 10) || 1;
+        const finalDiscount = parseInt(String(discount).replace(/[^0-9]/g, ""), 10) || 0;
+
         const transaction = await contract.ADD_MEDICINE(
           _IPFS_URL,
-          price,
-          quentity,
-          discount,
+          finalPriceInWei,
+          finalQuantity,
+          finalDiscount,
           currentLocation,
           {
             gasLimit: ethers.utils.hexlify(8000000),
@@ -171,8 +215,9 @@ export const StateContextProvider = ({ children }) => {
 
         if (transaction.hash) {
           setLoader(false);
-          notifySuccess("Medicine Registrations conplete");
-          window.location.reload();
+          notifySuccess("Medicine Registration complete");
+          setReCall((prev) => prev + 1);
+          return true;
         }
       }
     } catch (error) {
@@ -180,6 +225,7 @@ export const StateContextProvider = ({ children }) => {
       const errorMsg = PARSED_ERROR_MSG(error);
       notifyError(errorMsg);
       console.log(error);
+      return false;
     }
   };
 
@@ -209,7 +255,7 @@ export const StateContextProvider = ({ children }) => {
         if (transaction.hash) {
           setLoader(false);
           notifySuccess("Location updated successfully");
-          window.location.reload();
+          setReCall((prev) => prev + 1);
         }
       }
     } catch (error) {
@@ -233,9 +279,18 @@ export const StateContextProvider = ({ children }) => {
       if (address) {
         const contract = await HEALTH_CARE_CONTARCT();
 
+        const cleanPriceStr = String(update || "0").replace(/[^0-9.]/g, "").trim();
+        let finalPriceInWei;
+        try {
+          finalPriceInWei = ethers.utils.parseUnits(cleanPriceStr || "0", 18);
+        } catch (e) {
+          const rounded = parseFloat(cleanPriceStr || "0").toFixed(18).replace(/\.?0+$/, "");
+          finalPriceInWei = ethers.utils.parseUnits(rounded || "0", 18);
+        }
+
         const transaction = await contract.UPDATE_MEDICINE_PRICE(
           Number(medicineID),
-          Number(update),
+          finalPriceInWei,
           {
             gasLimit: ethers.utils.hexlify(8000000),
           }
@@ -246,7 +301,7 @@ export const StateContextProvider = ({ children }) => {
         if (transaction.hash) {
           setLoader(false);
           notifySuccess("Price updated successfully");
-          window.location.reload();
+          setReCall((prev) => prev + 1);
         }
       }
     } catch (error) {
@@ -270,9 +325,10 @@ export const StateContextProvider = ({ children }) => {
       if (address) {
         const contract = await HEALTH_CARE_CONTARCT();
 
+        const cleanQuantity = parseInt(String(update).replace(/[^0-9]/g, ""), 10) || 0;
         const transaction = await contract.UPDATE_MEDICINE_QUANTITY(
           Number(medicineID),
-          Number(update),
+          cleanQuantity,
           {
             gasLimit: ethers.utils.hexlify(8000000),
           }
@@ -283,7 +339,7 @@ export const StateContextProvider = ({ children }) => {
         if (transaction.hash) {
           setLoader(false);
           notifySuccess("quantity updated successfully");
-          window.location.reload();
+          setReCall((prev) => prev + 1);
         }
       }
     } catch (error) {
@@ -307,9 +363,10 @@ export const StateContextProvider = ({ children }) => {
       if (address) {
         const contract = await HEALTH_CARE_CONTARCT();
 
+        const cleanDiscount = parseInt(String(update).replace(/[^0-9]/g, ""), 10) || 0;
         const transaction = await contract.UPDATE_MEDICINE_DISCOUNT(
           Number(medicineID),
-          Number(update),
+          cleanDiscount,
           {
             gasLimit: ethers.utils.hexlify(8000000),
           }
@@ -320,7 +377,7 @@ export const StateContextProvider = ({ children }) => {
         if (transaction.hash) {
           setLoader(false);
           notifySuccess("discount updated successfully");
-          window.location.reload();
+          setReCall((prev) => prev + 1);
         }
       }
     } catch (error) {
@@ -355,7 +412,7 @@ export const StateContextProvider = ({ children }) => {
         if (transaction.hash) {
           setLoader(false);
           notifySuccess("Status updated successfully");
-          window.location.reload();
+          setReCall((prev) => prev + 1);
         }
       }
     } catch (error) {
@@ -470,8 +527,9 @@ export const StateContextProvider = ({ children }) => {
 
         if (transaction.hash) {
           setLoader(false);
-          notifySuccess("Registrations conplete");
-          window.location.reload();
+          notifySuccess("Registration complete! Awaiting admin approval.");
+          setReCall((prev) => prev + 1);
+          return true;
         }
       }
     } catch (error) {
@@ -479,6 +537,7 @@ export const StateContextProvider = ({ children }) => {
       const errorMsg = PARSED_ERROR_MSG(error);
       notifyError(errorMsg);
       console.log(error);
+      return false;
     }
   };
 
@@ -543,7 +602,7 @@ export const StateContextProvider = ({ children }) => {
         if (transaction.hash) {
           setLoader(false);
           notifySuccess("Registrations conplete");
-          window.location.reload();
+          setReCall((prev) => prev + 1);
         }
       }
     } catch (error) {
@@ -580,7 +639,7 @@ export const StateContextProvider = ({ children }) => {
         if (transaction.hash) {
           setLoader(false);
           notifySuccess("Registrations conplete");
-          window.location.reload();
+          setReCall((prev) => prev + 1);
         }
       }
     } catch (error) {
@@ -615,7 +674,7 @@ export const StateContextProvider = ({ children }) => {
         if (transaction.hash) {
           setLoader(false);
           notifySuccess("Registrations conplete");
-          window.location.reload();
+          setReCall((prev) => prev + 1);
         }
       }
     } catch (error) {
@@ -720,8 +779,9 @@ export const StateContextProvider = ({ children }) => {
 
         if (transaction.hash) {
           setLoader(false);
-          notifySuccess("Registrations conplete");
-          window.location.reload();
+          notifySuccess("Registration complete!");
+          setReCall((prev) => prev + 1);
+          return true;
         }
       }
     } catch (error) {
@@ -729,6 +789,7 @@ export const StateContextProvider = ({ children }) => {
       const errorMsg = PARSED_ERROR_MSG(error);
       notifyError(errorMsg);
       console.log(error);
+      return false;
     }
   };
 
@@ -781,7 +842,7 @@ export const StateContextProvider = ({ children }) => {
         if (transaction.hash) {
           setLoader(false);
           notifySuccess("Registrations conplete");
-          window.location.reload();
+          setReCall((prev) => prev + 1);
         }
       }
     } catch (error) {
@@ -806,9 +867,17 @@ export const StateContextProvider = ({ children }) => {
 
         const _patientID = await contract.GET_PATIENT_ID(address);
 
-        const price = _price * Number(_quantity);
+        const cleanPriceStr = String(_price || "0").replace(/[^0-9.]/g, "").trim();
+        let unitPriceWei;
+        try {
+          unitPriceWei = ethers.utils.parseUnits(cleanPriceStr || "0", 18);
+        } catch (e) {
+          const rounded = parseFloat(cleanPriceStr || "0").toFixed(18).replace(/\.?0+$/, "");
+          unitPriceWei = ethers.utils.parseUnits(rounded || "0", 18);
+        }
 
-        const parsedAmount = ethers.utils.parseEther(price.toString());
+        const qty = parseInt(String(_quantity).replace(/[^0-9]/g, ""), 10) || 1;
+        const parsedAmount = unitPriceWei.mul(ethers.BigNumber.from(qty));
 
         const paymentHash = await ethereum.request({
           method: "eth_sendTransaction",
@@ -817,7 +886,7 @@ export const StateContextProvider = ({ children }) => {
               from: address,
               to: ADMIN_ADDRESS,
               gas: "0x5208",
-              value: parsedAmount._hex,
+              value: parsedAmount.toHexString(),
             },
           ],
         });
@@ -836,7 +905,7 @@ export const StateContextProvider = ({ children }) => {
         if (transaction.hash) {
           setLoader(false);
           notifySuccess("Registration complete");
-          window.location.reload();
+          setReCall((prev) => prev + 1);
         }
       }
     } catch (error) {
@@ -912,7 +981,7 @@ export const StateContextProvider = ({ children }) => {
         if (transaction.hash) {
           setLoader(false);
           notifySuccess("Registrations conplete");
-          window.location.reload();
+          setReCall((prev) => prev + 1);
         }
       }
     } catch (error) {
@@ -947,7 +1016,7 @@ export const StateContextProvider = ({ children }) => {
         if (transaction.hash) {
           setLoader(false);
           notifySuccess("Registrations conplete");
-          window.location.reload();
+          setReCall((prev) => prev + 1);
         }
       }
     } catch (error) {
@@ -982,7 +1051,7 @@ export const StateContextProvider = ({ children }) => {
         if (transaction.hash) {
           setLoader(false);
           notifySuccess("Registrations conplete");
-          window.location.reload();
+          setReCall((prev) => prev + 1);
         }
       }
     } catch (error) {
@@ -1014,7 +1083,7 @@ export const StateContextProvider = ({ children }) => {
         if (transaction.hash) {
           setLoader(false);
           notifySuccess("Registrations conplete");
-          window.location.reload();
+          setReCall((prev) => prev + 1);
         }
       }
     } catch (error) {

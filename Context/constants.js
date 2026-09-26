@@ -1,15 +1,9 @@
 import { ethers } from "ethers";
 import Web3Modal from "web3modal";
-import OpenAI from "openai";
 import axios from "axios";
 
 import Healthcare from "./Healthcare.json";
-
-//OPEN AI
-const openai = new OpenAI({
-  apiKey: process.env.NEXT_PUBLIC_OPEN_AI_KEY,
-  dangerouslyAllowBrowser: true,
-});
+import { getSystemPrompt } from "../Components/Global/AI/prompts";
 
 const HEALTH_CARE_ABI = Healthcare.abi;
 const HEALTH_CARE_ADDRESS = process.env.NEXT_PUBLIC_HEALTH_CARE;
@@ -27,13 +21,20 @@ const networks = {
   holesky: {
     chainId: `0x${Number(17000).toString(16)}`,
     chainName: "Holesky",
+    nativeCurrency: { name: "ETH", symbol: "ETH", decimals: 18 },
+    rpcUrls: ["https://rpc.ankr.com/eth_holesky"],
+    blockExplorerUrls: ["https://holesky.etherscan.io/"],
+  },
+  sepolia: {
+    chainId: `0x${Number(11155111).toString(16)}`,
+    chainName: "Sepolia",
     nativeCurrency: {
       name: "ETH",
       symbol: "ETH",
       decimals: 18,
     },
-    rpcUrls: ["https://rpc.ankr.com/eth_holesky"],
-    blockExplorerUrls: ["https://holesky.etherscan.io/"],
+    rpcUrls: ["https://ethereum-sepolia-rpc.publicnode.com"],
+    blockExplorerUrls: ["https://sepolia.etherscan.io/"],
   },
   polygon_amoy: {
     chainId: `0x${Number(80002).toString(16)}`,
@@ -106,15 +107,30 @@ const networks = {
 const changeNetwork = async ({ networkName }) => {
   try {
     if (!window.ethereum) throw new Error("No crypto wallet found");
-    const network = await window.ethereum.request({
-      method: "wallet_addEthereumChain",
-      params: [
-        {
-          ...networks[networkName],
-        },
-      ],
+    const target = networks[networkName];
+    if (!target) return;
+
+    const currentChainId = await window.ethereum.request({
+      method: "eth_chainId",
     });
-    return network;
+
+    if (currentChainId && currentChainId.toLowerCase() === target.chainId.toLowerCase()) {
+      return;
+    }
+
+    try {
+      await window.ethereum.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: target.chainId }],
+      });
+    } catch (switchError) {
+      if (switchError.code === 4902) {
+        await window.ethereum.request({
+          method: "wallet_addEthereumChain",
+          params: [{ ...target }],
+        });
+      }
+    }
   } catch (err) {
     console.log(err.message);
   }
@@ -131,7 +147,7 @@ export const SHORTEN_ADDRESS = (address) =>
 
 export const PARSED_ERROR_MSG = (e) => {
   const json = JSON.parse(JSON.stringify(e));
-  return json?.reason || json?.error?.message;
+  return json?.reason || json?.error?.message || e?.message;
 };
 
 export function CONVERT_TIMESTAMP_TO_READABLE(timeStamp) {
@@ -154,14 +170,49 @@ export function CONVERT_TIMESTAMP_TO_READABLE(timeStamp) {
 const FETCH_CONTRACT = (address, abi, signer) =>
   new ethers.Contract(address, abi, signer);
 
-export const HEALTH_CARE_CONTARCT = async () => {
-  const web3Modal = new Web3Modal();
-  const connection = await web3Modal.connect();
-  const provider = new ethers.providers.Web3Provider(connection);
-  const signer = provider.getSigner();
+export const HEALTH_CARE_READ_CONTRACT = () => {
+  const rpcUrl =
+    networks[NETWORK]?.rpcUrls[0] ||
+    "https://ethereum-sepolia-rpc.publicnode.com";
+  const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
+  return FETCH_CONTRACT(HEALTH_CARE_ADDRESS, HEALTH_CARE_ABI, provider);
+};
 
-  const contract = FETCH_CONTRACT(HEALTH_CARE_ADDRESS, HEALTH_CARE_ABI, signer);
-  return contract;
+export const HEALTH_CARE_CONTARCT = async () => {
+  if (typeof window !== "undefined" && window.ethereum) {
+    try {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const accounts = await provider.listAccounts();
+      if (accounts && accounts.length > 0) {
+        const signer = provider.getSigner();
+        return FETCH_CONTRACT(HEALTH_CARE_ADDRESS, HEALTH_CARE_ABI, signer);
+      }
+    } catch (e) {
+      console.log("Using read provider fallback:", e);
+    }
+  }
+  return HEALTH_CARE_READ_CONTRACT();
+};
+
+export const CHECK_USER_REGISTERED_STATUS = async (address) => {
+  if (!address) return { isRegistered: false, userType: null };
+  try {
+    const readContract = HEALTH_CARE_READ_CONTRACT();
+    const [isDoc, isPat] = await Promise.all([
+      readContract.registeredDoctors(address),
+      readContract.registeredPatients(address),
+    ]);
+    if (isDoc) {
+      return { isRegistered: true, userType: "Doctor" };
+    }
+    if (isPat) {
+      return { isRegistered: true, userType: "Patient" };
+    }
+    return { isRegistered: false, userType: null };
+  } catch (err) {
+    console.log("CHECK_USER_REGISTERED_STATUS error:", err);
+    return { isRegistered: false, userType: null };
+  }
 };
 
 //CONTRACT FUNCTIONS
@@ -514,8 +565,18 @@ export const GET_ALL_REGISTERED_MEDICINES = async () => {
             email,
             image,
             description,
+            price: ipfsPrice,
           },
         } = await axios.get(IPFS_URL, {});
+
+        let displayPrice = ipfsPrice ? String(ipfsPrice) : "";
+        if (!displayPrice) {
+          try {
+            displayPrice = ethers.utils.formatEther(price);
+          } catch (e) {
+            displayPrice = price.toString();
+          }
+        }
 
         return {
           verifyingDoctor,
@@ -528,7 +589,7 @@ export const GET_ALL_REGISTERED_MEDICINES = async () => {
           companyEmail,
           discount: discount.toNumber(),
           manufactureAddress,
-          price: price.toNumber(),
+          price: displayPrice,
           quantity: quantity.toNumber(),
           currentLocation,
           mobile,
@@ -566,14 +627,24 @@ export const GET_MEDICINE_DETAILS = async (_medicineId) => {
       email,
       image,
       description,
+      price: ipfsPrice,
     },
   } = await axios.get(medic.IPFS_URL, {});
+
+  let displayPrice = ipfsPrice ? String(ipfsPrice) : "";
+  if (!displayPrice) {
+    try {
+      displayPrice = ethers.utils.formatEther(medic.price);
+    } catch (e) {
+      displayPrice = medic.price.toString();
+    }
+  }
 
   const _medicine = {
     medicineID: medic.id.toNumber(),
     discount: medic.discount.toNumber(),
     quantity: medic.quantity.toNumber(),
-    price: medic.price.toNumber(),
+    price: displayPrice,
     currentLocation: medic.currentLocation,
     active: medic.active,
     IPFS_URL: medic.IPFS_URL,
@@ -819,10 +890,26 @@ export const GET_ALL_PATIENT_ORDERS = async (_patientID) => {
       const patient = await GET_PATIENT_DETAILS(Number(_patientID));
       const medicine = await GET_MEDICINE_DETAILS(order?.medicineId.toNumber());
 
+      let orderPrice = medicine?.price || "";
+      if (!orderPrice) {
+        try {
+          orderPrice = ethers.utils.formatEther(order?.price);
+        } catch (e) {
+          orderPrice = order?.price?.toString();
+        }
+      }
+
+      let payAmountFormatted;
+      try {
+        payAmountFormatted = ethers.utils.formatEther(order?.payAmount);
+      } catch (e) {
+        payAmountFormatted = order?.payAmount?.toString();
+      }
+
       return {
         medicineId: order?.medicineId.toNumber(),
-        price: order?.price.toNumber(),
-        payAmount: order?.payAmount.toNumber(),
+        price: orderPrice,
+        payAmount: payAmountFormatted,
         quantity: order?.quantity.toNumber(),
         patientId: order?.patientId.toNumber(),
         date: order?.date.toNumber(),
@@ -1034,7 +1121,6 @@ export const UPLOAD_IPFS_IMAGE = async (file) => {
       headers: {
         pinata_api_key: PINATA_AIP_KEY,
         pinata_secret_api_key: PINATA_SECRECT_KEY,
-        "Content-Type": "multipart/form-data",
       },
     });
     const ImgHash = `https://gateway.pinata.cloud/ipfs/${response.data.IpfsHash}`;
@@ -1063,39 +1149,78 @@ export const UPLOAD_METADATA = async (data) => {
 
 //----END OF IPFS UPLOAD--------
 
-//-----------OPEN AI-------------
+//-----------GOOGLE GEMINI AI-------------
 
-export const ASK_AI_CHAT = async (prompt) => {
-  if (!prompt) {
+export const ASK_AI_CHAT = async (prompt, role = "General") => {
+  if (!prompt || !prompt.trim()) {
     return "Prompt Missing";
   }
 
-  const completion = await openai.chat.completions.create({
-    messages: [{ role: "system", content: prompt }],
-    model: "gpt-4o",
-  });
+  const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
 
-  if (completion?.choices[0].message) {
-    const response = {
+  if (!apiKey) {
+    return "Gemini API key is not configured. Please add NEXT_PUBLIC_GEMINI_API_KEY to your .env.local file.";
+  }
+
+  const systemInstruction = getSystemPrompt(role);
+
+  try {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+
+    const payload = {
+      system_instruction: {
+        parts: [{ text: systemInstruction }],
+      },
+      contents: [
+        {
+          role: "user",
+          parts: [{ text: prompt.trim() }],
+        },
+      ],
+      generationConfig: {
+        temperature: 0.3,
+        maxOutputTokens: 1200,
+      },
+    };
+
+    const apiResponse = await axios.post(url, payload, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const aiText =
+      apiResponse?.data?.candidates?.[0]?.content?.parts?.[0]?.text ||
+      "No response received from Gemini.";
+
+    const historyRecord = {
       prompt: prompt,
-      message: completion.choices[0].message.content,
+      message: aiText,
+      role: role,
       timestamp: new Date().toISOString(),
     };
 
     let CHAT_AI_ARRAY = [];
     const AI_ASK_HISTORY = localStorage.getItem("AI_ASK_HISTORY");
     if (AI_ASK_HISTORY) {
-      CHAT_AI_ARRAY = JSON.parse(localStorage.getItem("AI_ASK_HISTORY"));
-      CHAT_AI_ARRAY.push(response);
-      localStorage.setItem("AI_ASK_HISTORY", JSON.stringify(CHAT_AI_ARRAY));
-    } else {
-      CHAT_AI_ARRAY.push(response);
-      localStorage.setItem("AI_ASK_HISTORY", JSON.stringify(CHAT_AI_ARRAY));
+      try {
+        CHAT_AI_ARRAY = JSON.parse(AI_ASK_HISTORY);
+      } catch (e) {
+        CHAT_AI_ARRAY = [];
+      }
     }
-  }
+    CHAT_AI_ARRAY.push(historyRecord);
+    localStorage.setItem("AI_ASK_HISTORY", JSON.stringify(CHAT_AI_ARRAY));
 
-  console.log(completion.choices[0]);
-  return completion.choices[0].message.content;
+    return aiText;
+  } catch (error) {
+    console.error("Gemini API Error:", error?.response?.data || error.message);
+    const detail =
+      error?.response?.data?.error?.message ||
+      error.message ||
+      "Failed to communicate with Gemini API.";
+    return `Error: ${detail}`;
+  }
 };
 
-//-----------END OF OPEN AI-------------
+//-----------END OF GOOGLE GEMINI AI-------------
