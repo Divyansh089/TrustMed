@@ -1156,10 +1156,10 @@ export const ASK_AI_CHAT = async (prompt, role = "General") => {
     return "Prompt Missing";
   }
 
-  const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+  const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY?.trim();
 
   if (!apiKey) {
-    return "Gemini API key is not configured. Please add NEXT_PUBLIC_GEMINI_API_KEY to your .env.local file.";
+    return "Gemini API key is not configured. Please add NEXT_PUBLIC_GEMINI_API_KEY to your .env.local file and restart the dev server.";
   }
 
   const systemInstruction = getSystemPrompt(role);
@@ -1186,6 +1186,7 @@ export const ASK_AI_CHAT = async (prompt, role = "General") => {
     const apiResponse = await axios.post(url, payload, {
       headers: {
         "Content-Type": "application/json",
+        "x-goog-api-key": apiKey,
       },
     });
 
@@ -1215,6 +1216,9 @@ export const ASK_AI_CHAT = async (prompt, role = "General") => {
     return aiText;
   } catch (error) {
     console.error("Gemini API Error:", error?.response?.data || error.message);
+    if (error?.response?.status === 401) {
+      return "Error (401 Unauthorized): Invalid Gemini API Key. Google Gemini API keys start with 'AIzaSy...' and can be created for free at https://aistudio.google.com/app/apikey. If you just updated .env.local, please restart the Next.js dev server.";
+    }
     const detail =
       error?.response?.data?.error?.message ||
       error.message ||
