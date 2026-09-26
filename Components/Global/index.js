@@ -10,7 +10,6 @@ import ChatBox from "./ChatBox/ChatBox";
 //REGULAR
 import Preloader from "./Regular/Preloader";
 import Footer from "./Regular/Footer";
-import Theme from "./Regular/Theme";
 import Loader from "./Regular/Loader";
 
 //COMPONENTS
@@ -63,7 +62,6 @@ export {
   Home,
   Patient,
   Footer,
-  Theme,
   Doctor,
   Appointment,
   Shop,

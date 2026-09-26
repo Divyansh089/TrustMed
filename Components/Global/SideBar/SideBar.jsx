@@ -8,7 +8,7 @@ import {
   FaShoppingBag,
   FaUserAlt,
   SlCalender,
-  MdEmail,
+  BsChatDotsFill,
   FaArrowRightLong,
   BsRobot,
 } from "../../ReactICON/index";
@@ -195,7 +195,7 @@ const SideBar = ({
               onClick={() => setOpenComponent("Chat")}
             >
               <i>
-                <MdEmail />
+                <BsChatDotsFill />
               </i>
               <span className="nav-text">Chat</span>
             </a>
