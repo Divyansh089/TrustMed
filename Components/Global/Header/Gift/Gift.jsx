@@ -14,6 +14,7 @@ const Gift = () => {
         <ul className="timeline">
           {GiftData.map((item, index) => (
             <ListGift
+              key={index}
               index={index}
               title={item?.title}
               message={item?.message}

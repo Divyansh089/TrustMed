@@ -44,9 +44,12 @@ const Header = ({
   }, []);
 
   const handleAccountsChanged = (accounts) => {
-    console.log("Accounts changed:", accounts[0]);
-    setAddress(accounts[0]);
-    setOpenComponent("Home");
+    console.log("Accounts changed:", accounts?.[0]);
+    if (accounts && accounts.length > 0) {
+      setAddress(accounts[0]);
+    } else {
+      setAddress("");
+    }
   };
 
   return (

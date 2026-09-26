@@ -56,32 +56,28 @@ const DoctorProfile = ({ setPatientDetails, setOpenComponent, user }) => {
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      const address = await CHECKI_IF_CONNECTED_LOAD();
-      if (user?.doctorID) {
-        GET_DOCTOR_APPOINTMENTS_HISTORYS(user.doctorID).then((appointment) => {
-          const _newArray = appointment.filter(
-            (appointment) => appointment.isOpen
-          );
-          setDoctorAppoinments(_newArray);
-        });
-      }
-    };
-
-    fetchData();
+    if (user?.doctorID) {
+      GET_DOCTOR_APPOINTMENTS_HISTORYS(user.doctorID)
+        .then((appointment) => {
+          if (Array.isArray(appointment)) {
+            const _newArray = appointment.filter(
+              (item) => item.isOpen
+            );
+            setDoctorAppoinments(_newArray);
+          }
+        })
+        .catch((err) => console.log("Appointments fetch err:", err));
+    }
   }, [user?.doctorID]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const address = await CHECKI_IF_CONNECTED_LOAD();
-      if (address) {
-        GET_ALL_REGISTERED_MEDICINES().then((medicine) => {
+    if (address) {
+      GET_ALL_REGISTERED_MEDICINES()
+        .then((medicine) => {
           setRegisterMedicine(medicine);
-        });
-      }
-    };
-
-    fetchData();
+        })
+        .catch((err) => console.log("Medicines fetch err:", err));
+    }
   }, [address]);
 
   return (

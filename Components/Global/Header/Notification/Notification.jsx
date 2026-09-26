@@ -14,7 +14,11 @@ const Notification = ({ notifications, setOpenComponent }) => {
         className="widget-media dz-scroll p-3 height380"
       >
         <ul className="timeline">
-          {notifications?.map((item) => <ListCard item={item} />).slice(0, 10)}
+          {notifications
+            ?.slice(0, 10)
+            .map((item, index) => (
+              <ListCard key={`notif-${index}-${item?.notificationId ?? ""}`} item={item} />
+            ))}
         </ul>
       </div>
       <a
