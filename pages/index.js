@@ -28,6 +28,7 @@ import {
   AddDoctor,
   AddPatient,
   Auth,
+  LandingPage,
   Prescription,
   DoctorAppointment,
   MedicialHistory,
@@ -49,11 +50,13 @@ import {
   GET_NOTIFICATION,
   GET_ALL_APPOINTMENTS,
   CHECKI_IF_CONNECTED,
+  CHECK_USER_REGISTERED_STATUS,
+  HANDLE_NETWORK_SWITCH,
 } from "../Context/constants";
 
 import { useStateContext } from "../Context/index";
 
-const index = () => {
+const Index = () => {
   const {
     address,
     setAddress,
@@ -86,64 +89,94 @@ const index = () => {
   const [allAppointments, setAllAppointments] = useState();
 
   useEffect(() => {
+    // Always fetch approved doctors so patient registration modal has choices ready
+    GET_ALL_APPROVE_DOCTORS()
+      .then((doctors) => {
+        setRegisterDoctors(doctors);
+      })
+      .catch((err) => console.log("Doctors fetch err:", err));
+
     const fetchData = async () => {
+      if (!address) {
+        setAuthComponent(true);
+        return;
+      }
+
       try {
-        if (address) {
+        // Check if user is registered using the robust smart contract mapping
+        const userStatus = await CHECK_USER_REGISTERED_STATUS(address);
+
+        if (userStatus.isRegistered) {
+          // User IS registered -> allow access to dashboard
           setAuthComponent(false);
 
-          const appointments = await GET_ALL_APPOINTMENTS();
-          setAllAppointments(appointments);
+          if (userStatus.userType === "Doctor") {
+            setOpenComponent("DoctorProfile");
+            setUserType("Doctor");
+            try {
+              const doctor = await CHECK_DOCTOR_REGISTERATION(address);
+              setUser(doctor);
+              if (doctor && !doctor.isApproved) {
+                notifySuccess("Doctor profile loaded. Your account is pending admin approval.");
+              }
+            } catch (docErr) {
+              console.log("Error loading doctor profile:", docErr);
+            }
+          } else {
+            try {
+              const patient = await CHECK_PATIENT_REGISTERATION(address);
+              setUser(patient);
+              setOpenComponent("Profile");
+              setUserType("Patient");
+            } catch (patErr) {
+              console.log("Error loading patient profile:", patErr);
+            }
+          }
 
-          GET_NOTIFICATION(address).then((notification) => {
-            const reversedArray = [...notification].reverse();
-            setNotifications(reversedArray);
+          // Load appointments & notifications for registered user safely
+          try {
+            const appointments = await GET_ALL_APPOINTMENTS();
+            setAllAppointments(appointments);
+          } catch (appErr) {
+            console.log("Appointments fetch err:", appErr);
+          }
 
-            if (reversedArray?.length) {
+          try {
+            const notification = await GET_NOTIFICATION(address);
+            if (notification && notification.length) {
+              const reversedArray = [...notification].reverse();
+              setNotifications(reversedArray);
+
               let NOTIFICATION = 0;
               const ALL_NOTIFICATION = localStorage.getItem("ALL_NOTIFICATION");
               if (ALL_NOTIFICATION) {
                 NOTIFICATION = JSON.parse(
                   localStorage.getItem("ALL_NOTIFICATION")
                 );
-                setNotificationCount(reversedArray?.length - NOTIFICATION);
+                setNotificationCount(reversedArray.length - NOTIFICATION);
               } else {
-                setNotificationCount(reversedArray?.length);
+                setNotificationCount(reversedArray.length);
               }
             }
-          });
-
-          //CALLING DATA
-
-          GET_ALL_APPROVE_DOCTORS().then((doctors) => {
-            setRegisterDoctors(doctors);
-          });
-
-          GET_ALL_REGISTERED_PATIENTS().then((patients) => {
-            setRegisteredPatient(patients);
-          });
-
-          const checkUserType = await GET_USERNAME_TYPE(address);
-
-          if (checkUserType?.userType == "Doctor") {
-            setOpenComponent("DoctorProfile");
-            setUserType("Doctor");
-            const doctor = await CHECK_DOCTOR_REGISTERATION(address);
-            setUser(doctor);
-          } else {
-            const patient = await CHECK_PATIENT_REGISTERATION(address);
-            console.log(patientDetails);
-            setUser(patient);
-            setOpenComponent("Profile");
-            setUserType("Patient");
+          } catch (notifErr) {
+            console.log("Notifications fetch err:", notifErr);
           }
+
+          try {
+            const patients = await GET_ALL_REGISTERED_PATIENTS();
+            setRegisteredPatient(patients);
+          } catch (patListErr) {
+            console.log("Patients list fetch err:", patListErr);
+          }
+        } else {
+          // User is NOT registered -> keep them on landing page & alert via toast notification
+          setAuthComponent(true);
+          notifyError("User is not registered. Please register as a Patient or Doctor.");
         }
       } catch (error) {
-        const ErrorMsg = PARSED_ERROR_MSG(error);
-        console.log(ErrorMsg);
-        if (ErrorMsg == "User is not registered") {
-          setAuthComponent(true);
-        }
-        notifyError(ErrorMsg);
+        console.log("fetchData error:", error);
+        setAuthComponent(true);
+        notifyError("User is not registered. Please register as a Patient or Doctor.");
       }
     };
 
@@ -153,13 +186,17 @@ const index = () => {
   const connectMetaMask = async () => {
     if (typeof window.ethereum !== "undefined") {
       try {
+        await HANDLE_NETWORK_SWITCH();
         const accounts = await window.ethereum.request({
           method: "eth_requestAccounts",
         });
-        setAddress(accounts[0]);
-        notifySuccess("Connected successfully");
+        if (accounts && accounts.length > 0) {
+          setAddress(accounts[0]);
+          notifySuccess("Connected successfully");
+        }
       } catch (error) {
-        notifyError("Error connecting to MetaMask:");
+        console.log("Connect error:", error);
+        notifyError("Error connecting to MetaMask");
       }
     } else {
       notifyError("MetaMask is not installed.");
@@ -169,7 +206,10 @@ const index = () => {
   return (
     <>
       <Preloader />
-      <div id="main-wrapper">
+      <div
+        id="main-wrapper"
+        style={{ display: authComponent ? "none" : "block" }}
+      >
         <NavHeader />
 
         <Header
@@ -192,7 +232,7 @@ const index = () => {
           userType={userType}
           address={address}
         />
-        <div class="content-body">
+        <div className="content-body">
           {openComponent == "Home" ? (
             <Home
               setPatientDetails={setPatientDetails}
@@ -297,7 +337,7 @@ const index = () => {
               SEND_MESSAGE={SEND_MESSAGE}
             />
           ) : openComponent == "Ask AI" ? (
-            <AI setOpenComponent={setOpenComponent} />
+            <AI setOpenComponent={setOpenComponent} userType={userType} />
           ) : openComponent == "MedicialHistory" ? (
             <MedicialHistory setOpenComponent={setOpenComponent} />
           ) : openComponent == "User" ? (
@@ -322,11 +362,11 @@ const index = () => {
         </div>
       </div>
       {authComponent && (
-        <Auth
-          setAddDocotr={setAddDocotr}
-          setAddPatient={setAddPatient}
+        <LandingPage
           address={address}
           connectMetaMask={connectMetaMask}
+          setAddPatient={setAddPatient}
+          setAddDocotr={setAddDocotr}
           SHORTEN_ADDRESS={SHORTEN_ADDRESS}
         />
       )}
@@ -343,4 +383,4 @@ const index = () => {
   );
 };
 
-export default index;
+export default Index;
