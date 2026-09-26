@@ -34,6 +34,7 @@ const Shop = ({ setOpenComponent, setMedicineDetails, currency }) => {
       <div className="row">
         {registerMedicine?.map((item, index) => (
           <Card
+            key={`shop-card-${item?.medicineID || index}`}
             item={item}
             index={index}
             setOpenComponent={setOpenComponent}
