@@ -210,6 +210,7 @@ const AddPatient = ({ registerDoctors, setAddPatient }) => {
                       size={16}
                       className="form-control"
                       type="text"
+                      value={patient.walletAddress || ""}
                       onChange={(e) =>
                         setPatient({
                           ...patient,
@@ -240,12 +241,16 @@ const AddPatient = ({ registerDoctors, setAddPatient }) => {
             <button
               type="button"
               className="btn btn-danger light"
-              data-bs-dismiss="modal"
+              onClick={() => setAddPatient(false)}
             >
               Close
             </button>
             <button
-              onClick={() => ADD_PATIENTS(patient, doctor)}
+              type="button"
+              onClick={async () => {
+                const ok = await ADD_PATIENTS(patient, doctor);
+                if (ok) setAddPatient(false);
+              }}
               className="btn btn-primary"
             >
               Add Patient
