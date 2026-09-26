@@ -80,12 +80,12 @@ We are using RemixID for deploying the contract and generation of the ABI in the
   URL: https://www.ankr.com/rpc/
 ```
 
-#### OPEN AI
-
-```https://platform.openai.com/docs/api-reference/introduction
-  # OPEN AI KEY
-  URL: https://platform.openai.com/docs/api-reference/introduction
-  NEXT_PUBLIC_OPEN_AI_KEY=YOUR_OPEN_AI_KEY
+#### GOOGLE GEMINI AI
+ 
+```https://ai.google.dev/
+  # GEMINI AI KEY
+  URL: https://aistudio.google.com/
+  NEXT_PUBLIC_GEMINI_API_KEY=YOUR_GEMINI_API_KEY
 ```
 
 #### Pinata IPFS
