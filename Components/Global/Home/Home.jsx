@@ -1,6 +1,6 @@
 import React from "react";
 
-//INTERNAM IMPORT
+//INTERNAL IMPORT
 import {
   HeroCard1,
   HeroCard2,
@@ -9,14 +9,13 @@ import {
   HeroCard5,
   HeroCard6,
   HeroCard7,
-  HeroCard8,
   Header1,
 } from "../../SVG/index";
 import Header from "./Header";
 import Card from "./Card";
 import Revenue from "./Revenue";
 import Statistic from "./Statistic";
-import Doctors from "./Doctors";
+import FinancialChart from "./FinancialChart";
 import Patient from "./Patient";
 
 const Home = ({
@@ -34,9 +33,10 @@ const Home = ({
     <div className="container-fluid">
       <Header />
       <div className="row">
+        {/* Metric Cards Row */}
         <Card
           title={"Total Patient"}
-          patient={`${registeredPatient?.length}`}
+          patient={`${registeredPatient?.length || 0}`}
           number={"4"}
           iconOne={<HeroCard1 />}
           iconTwo={<HeroCard2 />}
@@ -44,7 +44,7 @@ const Home = ({
         />
         <Card
           title={"Doctor"}
-          patient={`${registerDoctors?.length}`}
+          patient={`${registerDoctors?.length || 0}`}
           number={".4"}
           iconOne={<HeroCard3 />}
           iconTwo={<HeroCard4 />}
@@ -52,7 +52,7 @@ const Home = ({
         />
         <Card
           title={"Appointment"}
-          patient={`${allAppointments?.length}`}
+          patient={`${allAppointments?.length || 0}`}
           number={".2"}
           iconOne={<HeroCard5 />}
           iconTwo={<HeroCard6 />}
@@ -60,19 +60,28 @@ const Home = ({
         />
         <Card
           title={"Notifications"}
-          patient={`${notifications?.length}`}
+          patient={`${notifications?.length || 0}`}
           number={".5"}
           iconOne={<HeroCard7 />}
           iconTwo={<Header1 />}
           classStyle={"bg-secondary"}
         />
 
+        {/* Row 2: Balance | Total Revenue | Network Fee */}
         <Revenue accountBalance={accountBalance} currency={currency} />
-        <Statistic />
-        <Doctors
+        <Statistic
           registerDoctors={registerDoctors}
-          setOpenComponent={setOpenComponent}
-          setDoctorDetails={setDoctorDetails}
+          registeredPatient={registeredPatient}
+          allAppointments={allAppointments}
+          currency={currency}
+        />
+
+        {/* Row 3: Financial Line Chart (Revenue & Network Fee) | Recent Patient */}
+        <FinancialChart
+          registerDoctors={registerDoctors}
+          registeredPatient={registeredPatient}
+          allAppointments={allAppointments}
+          currency={currency}
         />
         <Patient
           registeredPatient={registeredPatient}

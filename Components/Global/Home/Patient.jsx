@@ -13,7 +13,12 @@ const Patient = ({
       <div className="card border-0 pb-0">
         <div className="card-header flex-wrap border-0 pb-0">
           <h3 className="fs-20 mb-0 text-black">Recent Patient</h3>
-          <a href="patient-list.html" className="text-primary font-w500">
+          <a
+            href="javascript:void(0);"
+            onClick={() => setOpenComponent && setOpenComponent("Patient")}
+            className="text-primary font-w500"
+            style={{ cursor: "pointer" }}
+          >
             View more &gt;&gt;
           </a>
         </div>
