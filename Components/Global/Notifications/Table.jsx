@@ -9,7 +9,7 @@ const Table = ({ thead, tableData, name }) => {
       <TableHead thead={thead} />
       <tbody id="orders">
         {tableData?.map((item, index) => (
-          <TableList item={item} index={index} name={name} />
+          <TableList key={`table-notif-${index}`} item={item} index={index} name={name} />
         ))}
       </tbody>
     </table>

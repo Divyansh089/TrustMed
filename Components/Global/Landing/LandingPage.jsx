@@ -7,9 +7,6 @@ import { GiMedicines } from "react-icons/gi";
 import { IoMdClose } from "react-icons/io";
 import { SlCalender } from "react-icons/sl";
 
-// Reuse the exact same Nav1 + Nav3 SVGs as the dashboard sidebar
-import { Nav1, Nav3 } from "../../SVG/index";
-
 // ─── Inline SVG icons (no extra dependency) ─────────────────────────────────
 const IconLock = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -74,12 +71,10 @@ const IconHamburger = () => (
 const LandingPage = ({ address, connectMetaMask, setAddPatient, setAddDocotr, SHORTEN_ADDRESS }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled]             = useState(false);
-  const [statsVisible, setStatsVisible]     = useState(false);
 
   useEffect(() => {
     const onScroll = () => {
       setScrolled(window.scrollY > 30);
-      if (window.scrollY > 200) setStatsVisible(true);
     };
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
@@ -105,13 +100,6 @@ const LandingPage = ({ address, connectMetaMask, setAddPatient, setAddDocotr, SH
     { id: "for-patients", label: "For Patients" },
     { id: "for-doctors",  label: "For Doctors" },
     { id: "blockchain",   label: "Why Blockchain" },
-  ];
-
-  const stats = [
-    { value: "100K+", label: "Registered Patients", color: "#36c95f" },
-    { value: "100+",  label: "Verified Doctors",    color: "#3b82f6" },
-    { value: "100%",  label: "Secure Records",      color: "#a336c9" },
-    { value: "24/7",  label: "Platform Access",     color: "#f59e0b" },
   ];
 
   const whyCards = [
@@ -165,10 +153,9 @@ const LandingPage = ({ address, connectMetaMask, setAddPatient, setAddDocotr, SH
       {/* ══════════════ NAVBAR ══════════════════════════════════════════ */}
       <nav className={`tm-nav${scrolled ? " tm-nav--scrolled" : ""}`}>
         <div className="tm-nav__inner">
-          {/* Logo — exact same Nav1 + Nav3 SVGs as the dashboard sidebar */}
+          {/* Logo from public/svg directory */}
           <button className="tm-nav__logo-btn" onClick={() => scrollTo("home")}>
-            <Nav1 />
-            <Nav3 />
+            <img src="/svg/trustmed-logo.svg" alt="TrustMed" className="tm-nav__logo-img" />
           </button>
 
           {/* Desktop nav links */}
@@ -219,14 +206,11 @@ const LandingPage = ({ address, connectMetaMask, setAddPatient, setAddDocotr, SH
         <div className="tm-container tm-hero__inner">
           {/* LEFT: text */}
           <div className="tm-hero__text">
-            <span className="tm-badge">🏥 Decentralised Healthcare Platform</span>
-
             <h1 className="tm-hero__title">
-              Healthcare You<br />
-              Can <span className="tm-text-green">Trust.</span>
+              Your Health Records.<br />
+              Secured by <span className="tm-text-green">Blockchain.</span>
               <br />
-              Powered by<br />
-              <span className="tm-text-green">Decentralisation.</span>
+              Owned by <span className="tm-text-green">You.</span>
             </h1>
 
             <p className="tm-hero__desc">
@@ -234,13 +218,6 @@ const LandingPage = ({ address, connectMetaMask, setAddPatient, setAddDocotr, SH
               secure, transparent and decentralised healthcare ecosystem — where
               your data belongs to <em>you</em>.
             </p>
-
-            {address && (
-              <div className="tm-wallet-pill">
-                <span className="tm-wallet-dot" />
-                Wallet connected: {SHORTEN_ADDRESS(address)}
-              </div>
-            )}
 
             {/* Hero CTAs — both wired to existing registration pipeline */}
             <div className="tm-hero__ctas">
@@ -253,10 +230,6 @@ const LandingPage = ({ address, connectMetaMask, setAddPatient, setAddDocotr, SH
                 <span>Register as Doctor</span>
               </button>
             </div>
-
-            <button className="tm-hero__scroll-link" onClick={() => scrollTo("how-it-works")}>
-              Explore TrustMed &nbsp;<FaArrowRightLong />
-            </button>
           </div>
 
           {/* RIGHT: floating cards */}
@@ -277,44 +250,39 @@ const LandingPage = ({ address, connectMetaMask, setAddPatient, setAddDocotr, SH
             {/* Stat cards — same gradient-bx pattern as the dashboard */}
             <div className="tm-hero__float tm-hero__float--tl">
               <div className="tm-hero__float-label">Patient Registration</div>
-              <div className="tm-hero__float-val">100k+</div>
-              <span className="tm-hero__float-icon"><FaUserAlt /></span>
+              <div className="tm-hero__float-val-row">
+                <span className="tm-hero__float-val">100k+</span>
+                <span className="tm-hero__float-icon"><FaUserAlt /></span>
+              </div>
             </div>
             <div className="tm-hero__float tm-hero__float--br">
               <div className="tm-hero__float-label">Doctor Registration</div>
-              <div className="tm-hero__float-val">100+</div>
-              <span className="tm-hero__float-icon"><FaStethoscope /></span>
+              <div className="tm-hero__float-val-row">
+                <span className="tm-hero__float-val">100+</span>
+                <span className="tm-hero__float-icon"><FaStethoscope /></span>
+              </div>
             </div>
             <div className="tm-hero__float tm-hero__float--tr">
               <div className="tm-hero__float-label">Appointments</div>
-              <div className="tm-hero__float-val">500+</div>
-              <span className="tm-hero__float-icon"><SlCalender /></span>
+              <div className="tm-hero__float-val-row">
+                <span className="tm-hero__float-val">500+</span>
+                <span className="tm-hero__float-icon"><SlCalender /></span>
+              </div>
             </div>
           </div>
         </div>
 
-        <button className="tm-hero__down" onClick={() => scrollTo("stats")} aria-label="Scroll down">
-          <span />
-        </button>
-      </section>
-
-      {/* ══════════════ STATS ═══════════════════════════════════════════ */}
-      <section id="stats" className="tm-stats-section">
-        <div className="tm-container">
-          <div className="tm-stats-grid">
-            {stats.map((s, i) => (
-              <div
-                key={i}
-                className={`tm-stat-card${statsVisible ? " tm-stat-card--in" : ""}`}
-                style={{ "--c": s.color, animationDelay: `${i * 0.12}s` }}
-              >
-                <div className="tm-stat-card__val">{s.value}</div>
-                <div className="tm-stat-card__lbl">{s.label}</div>
-                <div className="tm-stat-card__bar" />
-              </div>
-            ))}
+        {/* Animated Mouse Scroll Indicator */}
+        <button
+          className="tm-mouse-scroll"
+          onClick={() => scrollTo("features")}
+          aria-label="Scroll down to features"
+        >
+          <div className="tm-mouse">
+            <span className="tm-mouse-wheel" />
           </div>
-        </div>
+          <span className="tm-mouse-arrow" />
+        </button>
       </section>
 
       {/* ══════════════ WHY TRUSTMED ════════════════════════════════════ */}
@@ -461,11 +429,10 @@ const LandingPage = ({ address, connectMetaMask, setAddPatient, setAddDocotr, SH
       <footer className="tm-footer">
         <div className="tm-container">
           <div className="tm-footer__grid">
-            {/* Brand — exact same logo as dashboard sidebar */}
+            {/* Brand logo from public/svg directory */}
             <div className="tm-footer__brand">
               <div className="tm-footer__logo-wrap">
-                <Nav1 />
-                <Nav3 />
+                <img src="/svg/trustmed-logo-white.svg" alt="TrustMed" className="tm-footer__logo-img" />
               </div>
               <p className="tm-footer__tagline">
                 A decentralised healthcare platform connecting patients and doctors through blockchain technology.
