@@ -34,18 +34,25 @@ const Chat = ({ SEND_MESSAGE }) => {
   const [activeChat, setActiveChat] = useState();
   const [chatMessage, setChatMessage] = useState();
   const [uploadFile, setUploadFile] = useState(false);
+  const [currentUser, setCurrentUser] = useState(address || "");
+  const messagesEndRef = React.useRef(null);
 
   const [messageChat, setMessageChat] = useState({
     message: "",
   });
 
   useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [chatMessage]);
+
+  useEffect(() => {
     const fetchData = async () => {
       try {
-        const address = await CHECKI_IF_CONNECTED_LOAD();
+        const connectedAddr = await CHECKI_IF_CONNECTED_LOAD();
 
-        if (address) {
-          GET_MY_FRIEND_LIST(address).then((friend) => {
+        if (connectedAddr) {
+          setCurrentUser(connectedAddr);
+          GET_MY_FRIEND_LIST(connectedAddr).then((friend) => {
             setActiveChat(friend[0]);
             console.log(friend);
             setFriendList(friend);
@@ -63,9 +70,10 @@ const Chat = ({ SEND_MESSAGE }) => {
   useEffect(() => {
     const fetchData = async (activeChat) => {
       try {
-        const address = await CHECKI_IF_CONNECTED_LOAD();
+        const connectedAddr = await CHECKI_IF_CONNECTED_LOAD();
 
-        if (address) {
+        if (connectedAddr) {
+          setCurrentUser(connectedAddr);
           GET_READ_MESSAGE(activeChat?.userAddress).then((message) => {
             console.log(message);
             setChatMessage(message);
@@ -154,27 +162,87 @@ const Chat = ({ SEND_MESSAGE }) => {
                               className="card-body msg_card_body dz-scroll"
                               id="DZ_W_Contacts_Body3"
                             >
-                              {chatMessage?.map((message, index) => (
-                                <div className="d-flex justify-content-start mb-4">
-                                  <div className="img_cont_msg">
-                                    <p
-                                      style={{
-                                        width: "40px",
-                                      }}
-                                    >
-                                      <FaUserAlt />
-                                    </p>
+                              {chatMessage?.map((message, index) => {
+                                const isSentByMe = Boolean(
+                                  (activeChat?.userAddress &&
+                                    message?.sender &&
+                                    activeChat.userAddress.toLowerCase() !==
+                                      message.sender.toLowerCase()) ||
+                                  (currentUser &&
+                                    message?.sender &&
+                                    currentUser.toLowerCase() ===
+                                      message.sender.toLowerCase()) ||
+                                  (address &&
+                                    message?.sender &&
+                                    address.toLowerCase() ===
+                                      message.sender.toLowerCase())
+                                );
+
+                                return isSentByMe ? (
+                                  <div key={index} className="chat-msg-sent">
+                                    <div className="chat-bubble-sent">
+                                      <div className="chat-msg-meta">
+                                        You • {message.timestamp}
+                                      </div>
+                                      <p className="chat-msg-text">
+                                        {message.msg}
+                                      </p>
+                                    </div>
+                                    <div className="ms-2 d-flex align-items-end mb-1">
+                                      <div
+                                        style={{
+                                          width: "32px",
+                                          height: "32px",
+                                          borderRadius: "50%",
+                                          backgroundColor: "#e8f5e9",
+                                          color: "#04A547",
+                                          display: "flex",
+                                          alignItems: "center",
+                                          justifyContent: "center",
+                                          fontSize: "13px",
+                                          flexShrink: 0,
+                                        }}
+                                      >
+                                        <FaUserAlt />
+                                      </div>
+                                    </div>
                                   </div>
-                                  <div className="msg_cotainer">
-                                    <p>
-                                      {SHORTEN_ADDRESS(message.sender)} &nbsp; (
-                                      {message.timestamp})
-                                    </p>
-                                    <small>{message.msg}</small>
+                                ) : (
+                                  <div
+                                    key={index}
+                                    className="chat-msg-received"
+                                  >
+                                    <div className="me-2 d-flex align-items-end mb-1">
+                                      <div
+                                        style={{
+                                          width: "32px",
+                                          height: "32px",
+                                          borderRadius: "50%",
+                                          backgroundColor: "#f1f5f9",
+                                          color: "#64748b",
+                                          display: "flex",
+                                          alignItems: "center",
+                                          justifyContent: "center",
+                                          fontSize: "13px",
+                                          flexShrink: 0,
+                                        }}
+                                      >
+                                        <FaUserAlt />
+                                      </div>
+                                    </div>
+                                    <div className="chat-bubble-received">
+                                      <div className="chat-msg-meta">
+                                        {SHORTEN_ADDRESS(message.sender)} •{" "}
+                                        {message.timestamp}
+                                      </div>
+                                      <p className="chat-msg-text">
+                                        {message.msg}
+                                      </p>
+                                    </div>
                                   </div>
-                                  <br />
-                                </div>
-                              ))}
+                                );
+                              })}
+                              <div ref={messagesEndRef} />
                             </div>
                           </>
                         </div>
@@ -200,7 +268,7 @@ const Chat = ({ SEND_MESSAGE }) => {
                       <button
                         className="btn btn-danger light btn-sl-sm me-2"
                         type="button"
-                        onClick={() => window.location.reload()}
+                        onClick={() => setMessageChat({ ...messageChat, message: "" })}
                       >
                         <span className="me-2">
                           <i className="fa ">
