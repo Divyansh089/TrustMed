@@ -328,6 +328,89 @@
   margin: 0 auto !important;
 }
 
+/* ========================================================
+   SIDEBAR TOGGLE ARROW BUTTON (HEADER)
+   ======================================================== */
+.nav-control {
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  right: -3.85rem !important;
+}
+
+.sidebar-arrow-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(32, 222, 77, 0.1);
+  color: var(--primary, #20DE4D);
+  border: 1.5px solid rgba(32, 222, 77, 0.25);
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.sidebar-arrow-btn:hover {
+  background: var(--primary, #20DE4D) !important;
+  color: #ffffff !important;
+  border-color: var(--primary, #20DE4D) !important;
+  transform: scale(1.08);
+  box-shadow: 0 4px 14px rgba(32, 222, 77, 0.35);
+}
+
+.sidebar-arrow-btn:active {
+  transform: scale(0.94);
+}
+
+.sidebar-arrow-btn svg {
+  font-size: 15px;
+  transition: transform 0.25s ease;
+}
+
+[data-theme-version="dark"] .sidebar-arrow-btn {
+  background: rgba(32, 222, 77, 0.14);
+  color: #20DE4D;
+  border-color: rgba(32, 222, 77, 0.35);
+}
+
+[data-theme-version="dark"] .sidebar-arrow-btn:hover {
+  background: #20DE4D !important;
+  color: #0b0f19 !important;
+  border-color: #20DE4D !important;
+  box-shadow: 0 4px 14px rgba(32, 222, 77, 0.45);
+}
+
+@media only screen and (max-width: 767px) {
+  .nav-control {
+    right: -2.5rem !important;
+  }
+  .sidebar-arrow-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+  }
+  .sidebar-arrow-btn svg {
+    font-size: 13px;
+  }
+}
+
+/* Hide Theme Switcher / Style Picker across entire website */
+.sidebar-right,
+.sidebar-right-trigger,
+.sidebar-right-inner,
+.new-setting,
+.dz-demo-panel,
+.dz-demo-bx {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
 /* CHAT MESSAGE BUBBLES - SENT (RIGHT) & RECEIVED (LEFT) */
 .chat-msg-sent {
   display: flex;
@@ -437,19 +520,23 @@
   fill: #ffffff !important;
 }
 
-.deznav .metismenu > li.mm-active > a svg path,
-.deznav .metismenu > li.mm-active > a svg g,
+.deznav .metismenu > li.mm-active > a svg path:not([fill="none"]),
+.deznav .metismenu > li.mm-active > a svg g:not([fill="none"]),
 .deznav .metismenu > li.mm-active > a g [fill],
-.deznav .metismenu > li.active > a svg path,
-.deznav .metismenu > li.active > a svg g,
+.deznav .metismenu > li.active > a svg path:not([fill="none"]),
+.deznav .metismenu > li.active > a svg g:not([fill="none"]),
 .deznav .metismenu > li.active > a g [fill],
-.deznav .metismenu > li > a.mm-active svg path,
-.deznav .metismenu > li > a.mm-active svg g,
+.deznav .metismenu > li > a.mm-active svg path:not([fill="none"]),
+.deznav .metismenu > li > a.mm-active svg g:not([fill="none"]),
 .deznav .metismenu > li > a.mm-active g [fill],
-.deznav .metismenu > li:hover > a svg path,
-.deznav .metismenu > li:hover > a svg g,
+.deznav .metismenu > li:hover > a svg path:not([fill="none"]),
+.deznav .metismenu > li:hover > a svg g:not([fill="none"]),
 .deznav .metismenu > li:hover > a g [fill] {
   fill: #ffffff !important;
+}
+
+svg path[fill="none"] {
+  fill: none !important;
 }
 
 /* Sidebar mini/collapsed mode icon centering and sizing */
