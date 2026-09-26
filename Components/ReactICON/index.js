@@ -1,4 +1,4 @@
-import { FaArrowRightLong } from "react-icons/fa6";
+import { FaArrowRightLong, FaArrowLeft, FaArrowRight } from "react-icons/fa6";
 import { IoIosSunny } from "react-icons/io";
 import { IoMoon } from "react-icons/io5";
 import { CgMenuGridR } from "react-icons/cg";
@@ -17,7 +17,7 @@ import {
   TiSocialLinkedin,
 } from "react-icons/ti";
 import { IoIosStar } from "react-icons/io";
-import { BsSendFill } from "react-icons/bs";
+import { BsSendFill, BsChatDotsFill } from "react-icons/bs";
 import { AiFillDelete } from "react-icons/ai";
 import { FaRegEdit } from "react-icons/fa";
 import { FaEye } from "react-icons/fa";
@@ -41,6 +41,8 @@ import { FaHospital } from "react-icons/fa";
 export {
   FaHospital,
   FaArrowRightLong,
+  FaArrowLeft,
+  FaArrowRight,
   GiMedicines,
   MdAdminPanelSettings,
   FaRegCopy,
@@ -75,4 +77,5 @@ export {
   FaPhone,
   FaMapMarker,
   FcDepartment,
+  BsChatDotsFill,
 };

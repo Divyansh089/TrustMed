@@ -223,6 +223,7 @@ const Index = () => {
           notifications={notifications}
           notificationCount={notificationCount}
           setNotificationCount={setNotificationCount}
+          openComponent={openComponent}
         />
         <SideBar
           setOpenComponent={setOpenComponent}
